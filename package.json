@@ -1,22 +1,13 @@
 {
   "name": "gemini-schedule-demo",
   "version": "1.0.0",
-  "description": "A demo application showing how to use Google's Gemini API for pain data summarization",
+  "description": "MapSummaryGeneration - AI-powered pain data summarization using Google Gemini API",
   "main": "dist/map-summary-test.js",
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/map-summary-test.js",
     "dev": "ts-node --transpile-only map-summary-test.ts",
     "test": "npm run build && node dist/map-summary-test.js",
-    "dayplanner": "npm run build && node dist/dayplanner-tests.js",
-    "manual": "npm run build && node -e \"require('./dist/dayplanner-tests.js').testManualScheduling()\"",
-    "llm": "npm run build && node -e \"require('./dist/dayplanner-tests.js').testLLMScheduling()\"",
-    "mixed": "npm run build && node -e \"require('./dist/dayplanner-tests.js').testMixedScheduling()\"",
-    "map-summary": "ts-node --transpile-only map-summary-test.ts",
-    "map-summary-build": "npm run build && node dist/map-summary-test.js",
-    "map-validation": "npm run build && node -e \"require('./dist/map-summary-test.js').testApiKeyValidation()\"",
-    "map-tones": "npm run build && node -e \"require('./dist/map-summary-test.js').testToneAndAudienceVariations()\"",
-    "map-basic": "npm run build && node -e \"require('./dist/map-summary-test.js').testMapSummaryGeneration()\"",
     "scenario1": "npm run build && node -e \"require('./dist/map-summary-test.js').testScenario1_PatientSelfTracking()\"",
     "scenario2": "npm run build && node -e \"require('./dist/map-summary-test.js').testScenario2_CaregiverMonitoring()\"",
     "scenario3": "npm run build && node -e \"require('./dist/map-summary-test.js').testScenario3_ResearchDataCollection()\""
