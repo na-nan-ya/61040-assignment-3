@@ -4,7 +4,7 @@
 
 A user has been logging moderate-to-severe knee pain in their BodyMaps almost everyday for a month now. The user's doctor has advised them to only schedule an appointment when the pain has been consistently bad for a month. The user taps the already highlighted knee region of that day's BodyMap and selects the last month's date range, an encouraging tone, and a patient (i.e. user) audience. They want to feel validated that they are not exaggerating the pain in their head. Now, instead of a bland single-sentence stats summary, the summary commends them for consistently logging their pain and presents the numbers. The user screenshots it for their own reference. Then, they repeat the process but select a factual tone and a healthcare professional audience for the summary to be directed at. This time, it is a concsise, professional summary that illustrates the patient's pain. They schedule an appointment and screenshot this as well to show to their PCP.
 
-[UX Sketch]()
+[UX Sketch](UXSketch.png)
 
 2. 3 test cases
 
