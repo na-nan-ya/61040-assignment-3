@@ -462,138 +462,27 @@ async function testScenario1_PatientSelfTracking() {
     console.log('✅ Scenario 1 Complete\n');
 }
 
-// ==================== SCENARIO 2: Caregiver Monitoring Parent ====================
+// ==================== SCENARIO 2: Research Data Collection ====================
 
 /**
- * SCENARIO 2: Caregiver Monitoring Elderly Parent
+ * SCENARIO 2: Research Study Data Collection
  * 
  * User Story:
- * User 2 is caring for their 72-year-old parent who has arthritis in multiple joints.
- * They track pain to help manage care and communicate with the healthcare team.
- * 
- * User Actions Sequence:
- * 1. User 2 tracks parent's pain across multiple regions
- * 2. They notice knee pain is most frequent and severe
- * 3. They want to understand patterns to adjust daily activities
- * 4. They need to share data with family members
- * 5. They prepare a professional report for the doctor
- */
-async function testScenario2_CaregiverMonitoring() {
-    console.log('\n' + '='.repeat(80));
-    console.log('SCENARIO 2: Caregiver Monitoring Elderly Parent');
-    console.log('='.repeat(80));
-    console.log('\nUser: User 2, caregiver for elderly parent with arthritis');
-    console.log('Goal: Track multi-region pain and coordinate care\n');
-
-    const mothersPainData: PainDataMaps = {
-        'This Month': [
-            { region: 'Knees', painScore: 7, timestamp: new Date('2024-01-02T08:00:00') },
-            { region: 'Knees', painScore: 8, timestamp: new Date('2024-01-04T09:00:00') },
-            { region: 'Knees', painScore: 6, timestamp: new Date('2024-01-06T10:00:00') },
-            { region: 'Knees', painScore: 7, timestamp: new Date('2024-01-08T08:30:00') },
-            { region: 'Knees', painScore: 8, timestamp: new Date('2024-01-10T09:00:00') },
-            { region: 'Knees', painScore: 7, timestamp: new Date('2024-01-12T10:00:00') },
-            { region: 'Knees', painScore: 9, timestamp: new Date('2024-01-14T08:00:00') },
-            { region: 'Knees', painScore: 7, timestamp: new Date('2024-01-16T09:30:00') },
-            { region: 'Knees', painScore: 8, timestamp: new Date('2024-01-18T10:00:00') }
-        ]
-    };
-
-    const generator = createMapSummaryGenerator(testConfig);
-
-    console.log('📊 Action 1: User 2 reviews knee pain data (most severe)\n');
-    const kneeSummary = generator.sumRegion('This Month', mothersPainData, 'Knees');
-    console.log(`Data Summary:
-   - Region: ${kneeSummary.region}
-   - Frequency: ${kneeSummary.frequency} entries this month
-   - Median Score: ${kneeSummary.medianScore}/10\n`);
-
-    console.log('🤖 LLM Action 2a: Generate practical summary for caregiver\n');
-    try {
-        const caregiverSummary = await generator.summariseWithAI(
-            'This Month',
-            'Knees',
-            kneeSummary.frequency,
-            kneeSummary.medianScore,
-            testConfig,
-            {
-                tone: SummaryTone.COMPASSIONATE,
-                audience: SummaryAudience.CAREGIVER,
-                fallbackEnabled: true
-            },
-            kneeSummary.dateRange
-        );
-        console.log(`Summary for Caregiver (User 2):\n"${caregiverSummary}"\n`);
-    } catch (error) {
-        console.log(`Error: ${(error as Error).message}\n`);
-    }
-
-    console.log('📊 Action 2: User 2 prepares update for family members\n');
-    console.log('🤖 LLM Action 2b: Generate clear summary for family members\n');
-    try {
-        const familySummary = await generator.summariseWithAI(
-            'This Month',
-            'Knees',
-            kneeSummary.frequency,
-            kneeSummary.medianScore,
-            testConfig,
-            {
-                tone: SummaryTone.PROFESSIONAL,
-                audience: SummaryAudience.FAMILY,
-                fallbackEnabled: true
-            },
-            kneeSummary.dateRange
-        );
-        console.log(`Summary for Family:\n"${familySummary}"\n`);
-    } catch (error) {
-        console.log(`Error: ${(error as Error).message}\n`);
-    }
-
-    console.log('📊 Action 3: User 2 prepares professional report for doctor\n');
-    console.log('🤖 LLM Action 2c: Generate professional report for healthcare provider\n');
-    try {
-        const doctorReport = await generator.summariseWithAI(
-            'This Month',
-            'Knees',
-            kneeSummary.frequency,
-            kneeSummary.medianScore,
-            testConfig,
-            {
-                tone: SummaryTone.PROFESSIONAL,
-                audience: SummaryAudience.DOCTOR,
-                fallbackEnabled: true
-            },
-            kneeSummary.dateRange
-        );
-        console.log(`Professional Report for Doctor:\n"${doctorReport}"\n`);
-    } catch (error) {
-        console.log(`Error: ${(error as Error).message}\n`);
-    }
-
-    console.log('✅ Scenario 2 Complete\n');
-}
-
-// ==================== SCENARIO 3: Research Data Collection ====================
-
-/**
- * SCENARIO 3: Research Study Data Collection
- * 
- * User Story:
- * User 3 is conducting a clinical research study on chronic pain patterns.
+ * User 2 is conducting a clinical research study on chronic pain patterns.
  * They collect pain data from study participants and need objective summaries
  * for research analysis and publications.
  * 
  * User Actions Sequence:
  * 1. Research participant tracks pain using standardized protocol
  * 2. Data is collected for neck pain over 4 weeks
- * 3. User 3 needs factual summaries for research analysis
+ * 3. User 2 needs factual summaries for research analysis
  * 4. They require objective language for publication
  */
-async function testScenario3_ResearchDataCollection() {
+async function testScenario2_ResearchDataCollection() {
     console.log('\n' + '='.repeat(80));
-    console.log('SCENARIO 3: Research Study Data Collection');
+    console.log('SCENARIO 2: Research Study Data Collection');
     console.log('='.repeat(80));
-    console.log('\nUser: User 3, clinical researcher studying chronic pain');
+    console.log('\nUser: User 2, clinical researcher studying chronic pain');
     console.log('Goal: Collect and analyze standardized pain data for research\n');
 
     const studyParticipantData: PainDataMaps = {
@@ -625,7 +514,7 @@ async function testScenario3_ResearchDataCollection() {
 
     const generator = createMapSummaryGenerator(testConfig);
 
-    console.log('📊 Action 1: User 3 analyzes baseline data (pre-intervention)\n');
+    console.log('📊 Action 1: User 2 analyzes baseline data (pre-intervention)\n');
     const baselineSummary = generator.sumRegion('Baseline (Weeks 1-2)', studyParticipantData, 'Neck');
     console.log(`Data Summary:
    - Study Period: Baseline (Weeks 1-2)
@@ -633,7 +522,7 @@ async function testScenario3_ResearchDataCollection() {
    - Sample Size: ${baselineSummary.frequency} data points
    - Median Pain Intensity: ${baselineSummary.medianScore}/10 on NRS\n`);
 
-    console.log('🤖 LLM Action 3a: Generate objective research summary\n');
+    console.log('🤖 LLM Action 2a: Generate objective research summary\n');
     try {
         const researchSummary = await generator.summariseWithAI(
             'Baseline (Weeks 1-2)',
@@ -653,7 +542,7 @@ async function testScenario3_ResearchDataCollection() {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 2: User 3 analyzes post-intervention data\n');
+    console.log('📊 Action 2: User 2 analyzes post-intervention data\n');
     const postSummary = generator.sumRegion('Post-Intervention (Weeks 3-4)', studyParticipantData, 'Neck');
     console.log(`Data Summary:
    - Study Period: Post-Intervention (Weeks 3-4)
@@ -661,7 +550,7 @@ async function testScenario3_ResearchDataCollection() {
    - Sample Size: ${postSummary.frequency} data points
    - Median Pain Intensity: ${postSummary.medianScore}/10 on NRS\n`);
 
-    console.log('🤖 LLM Action 3b: Generate objective post-intervention summary\n');
+    console.log('🤖 LLM Action 2b: Generate objective post-intervention summary\n');
     try {
         const postResearchSummary = await generator.summariseWithAI(
             'Post-Intervention (Weeks 3-4)',
@@ -681,14 +570,317 @@ async function testScenario3_ResearchDataCollection() {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 3: User 3 prepares comparative analysis\n');
+    console.log('📊 Action 3: User 2 prepares comparative analysis\n');
     console.log(`Comparative Statistics:
    - Baseline Median: ${baselineSummary.medianScore}/10
    - Post-Intervention Median: ${postSummary.medianScore}/10
    - Change: ${(baselineSummary.medianScore - postSummary.medianScore).toFixed(1)} points
    - Percent Change: ${(((baselineSummary.medianScore - postSummary.medianScore) / baselineSummary.medianScore) * 100).toFixed(1)}%\n`);
 
-    console.log('✅ Scenario 3 Complete\n');
+    console.log('✅ Scenario 2 Complete\n');
+}
+
+// ==================== EDGE CASE: Single Data Point ====================
+
+/**
+ * EDGE CASE: Single Data Point
+ * 
+ * Tests the system's behavior when there is only one pain entry for a region.
+ * This edge case verifies:
+ * - Median calculation with single value
+ * - AI summary generation with minimal data
+ * - Proper handling of singular vs plural in summaries
+ */
+async function testEdgeCase_SingleDataPoint() {
+    console.log('\n' + '='.repeat(80));
+    console.log('EDGE CASE TEST: Single Data Point');
+    console.log('='.repeat(80));
+    console.log('\nScenario: User has only recorded one pain entry\n');
+
+    const singleDataPoint: PainDataMaps = {
+        'Yesterday': [
+            { region: 'Wrist', painScore: 4, timestamp: new Date('2024-01-20T14:30:00') }
+        ]
+    };
+
+    const generator = createMapSummaryGenerator(testConfig);
+
+    console.log('📊 Testing with single data point\n');
+    const summary = generator.sumRegion('Yesterday', singleDataPoint, 'Wrist');
+    console.log(`Data Summary:
+   - Period: Yesterday
+   - Region: ${summary.region}
+   - Frequency: ${summary.frequency} entry (SINGLE DATA POINT)
+   - Median Score: ${summary.medianScore}/10
+   - Total Entries: ${summary.totalEntries}\n`);
+
+    console.log('🤖 Generating AI summary with compassionate tone\n');
+    try {
+        const compassionateSummary = await generator.summariseWithAI(
+            'Yesterday',
+            'Wrist',
+            summary.frequency,
+            summary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.COMPASSIONATE,
+                audience: SummaryAudience.PATIENT,
+                fallbackEnabled: true
+            },
+            summary.dateRange
+        );
+        console.log(`Compassionate Summary:\n"${compassionateSummary}"\n`);
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    console.log('🤖 Generating AI summary with factual tone\n');
+    try {
+        const factualSummary = await generator.summariseWithAI(
+            'Yesterday',
+            'Wrist',
+            summary.frequency,
+            summary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.FACTUAL,
+                audience: SummaryAudience.RESEARCH,
+                fallbackEnabled: true
+            },
+            summary.dateRange
+        );
+        console.log(`Factual Summary:\n"${factualSummary}"\n`);
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    console.log('📊 Testing with zero data points (non-existent region)\n');
+    const noDataSummary = generator.sumRegion('Yesterday', singleDataPoint, 'Elbow');
+    console.log(`Data Summary:
+   - Period: Yesterday
+   - Region: ${noDataSummary.region}
+   - Frequency: ${noDataSummary.frequency} entries (NO DATA)
+   - Median Score: ${noDataSummary.medianScore}/10
+   - Total Entries: ${noDataSummary.totalEntries}\n`);
+
+    if (noDataSummary.frequency === 0) {
+        console.log('✅ System correctly handles missing region data in calculation\n');
+    }
+
+    console.log('🤖 Generating AI summary for region with no data (should say nothing logged yet)\n');
+    try {
+        const noDataAISummary = await generator.summariseWithAI(
+            'Yesterday',
+            'Elbow',
+            noDataSummary.frequency,
+            noDataSummary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.COMPASSIONATE,
+                audience: SummaryAudience.PATIENT,
+                fallbackEnabled: true
+            },
+            noDataSummary.dateRange
+        );
+        console.log(`No Data Summary:\n"${noDataAISummary}"\n`);
+        
+        // Check if the summary appropriately indicates no data was logged
+        const summaryLower = noDataAISummary.toLowerCase();
+        const goodPhrases = [
+            "haven't logged",
+            "haven't tracked",
+            "no entries",
+            "no data",
+            "not logged",
+            "not tracked",
+            "not recorded"
+        ];
+        const badPhrases = [
+            "no pain",
+            "pain-free",
+            "wonderful",
+            "great news",
+            "glad",
+            "comfort"
+        ];
+        
+        const hasGoodPhrase = goodPhrases.some(phrase => summaryLower.includes(phrase));
+        const hasBadPhrase = badPhrases.some(phrase => summaryLower.includes(phrase));
+        
+        if (hasGoodPhrase && !hasBadPhrase) {
+            console.log('✅ AI summary correctly indicates no data was logged (not that pain was low)\n');
+        } else if (hasBadPhrase) {
+            console.log('⚠️ AI incorrectly interprets 0 entries as "no pain" instead of "no data logged"\n');
+        } else if (summaryLower.includes('0')) {
+            console.log('⚠️ AI mentions zero but phrasing could be clearer about no data being logged\n');
+        } else {
+            console.log('⚠️ AI summary may not clearly indicate absence of data\n');
+        }
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    console.log('✅ Edge Case Test Complete: Single Data Point\n');
+}
+
+// ==================== EDGE CASE: Extreme Tones ====================
+
+/**
+ * EDGE CASE: Extreme Tones
+ * 
+ * Tests the system with extreme or mismatched tone/audience combinations.
+ * This edge case verifies:
+ * - Encouraging tone with severe pain data
+ * - Clinical tone for family members
+ * - Very factual tone with emotional situations
+ * - System's ability to maintain appropriate boundaries
+ */
+async function testEdgeCase_ExtremeTones() {
+    console.log('\n' + '='.repeat(80));
+    console.log('EDGE CASE TEST: Extreme Tone & Audience Combinations');
+    console.log('='.repeat(80));
+    console.log('\nScenario: Testing potentially problematic tone/audience combinations\n');
+
+    // Test data with severe, frequent pain
+    const severePainData: PainDataMaps = {
+        'This Week': [
+            { region: 'Head', painScore: 9, timestamp: new Date('2024-01-15T08:00:00') },
+            { region: 'Head', painScore: 10, timestamp: new Date('2024-01-16T08:00:00') },
+            { region: 'Head', painScore: 9, timestamp: new Date('2024-01-17T08:00:00') },
+            { region: 'Head', painScore: 10, timestamp: new Date('2024-01-18T08:00:00') },
+            { region: 'Head', painScore: 9, timestamp: new Date('2024-01-19T08:00:00') },
+            { region: 'Head', painScore: 10, timestamp: new Date('2024-01-20T08:00:00') },
+            { region: 'Head', painScore: 9, timestamp: new Date('2024-01-21T08:00:00') }
+        ]
+    };
+
+    const generator = createMapSummaryGenerator(testConfig);
+    const summary = generator.sumRegion('This Week', severePainData, 'Head');
+
+    console.log(`📊 Test Data (Severe Pain):
+   - Frequency: ${summary.frequency} entries
+   - Median Score: ${summary.medianScore}/10 (VERY SEVERE)
+   - Region: ${summary.region}\n`);
+
+    // Test 1: Encouraging tone with severe pain
+    console.log('🎭 Test 1: Encouraging tone with severe pain data\n');
+    console.log('❓ Question: Can the system stay encouraging without being insensitive?\n');
+    try {
+        const encouragingSevere = await generator.summariseWithAI(
+            'This Week',
+            'Head',
+            summary.frequency,
+            summary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.ENCOURAGING,
+                audience: SummaryAudience.PATIENT,
+                fallbackEnabled: true
+            },
+            summary.dateRange
+        );
+        console.log(`Encouraging + Severe Pain:\n"${encouragingSevere}"\n`);
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    // Test 2: Clinical tone for family (technical language for non-medical audience)
+    console.log('🎭 Test 2: Clinical tone for family members\n');
+    console.log('❓ Question: Can the system balance clinical language for non-medical audience?\n');
+    try {
+        const clinicalFamily = await generator.summariseWithAI(
+            'This Week',
+            'Head',
+            summary.frequency,
+            summary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.CLINICAL,
+                audience: SummaryAudience.FAMILY,
+                fallbackEnabled: true
+            },
+            summary.dateRange
+        );
+        console.log(`Clinical + Family:\n"${clinicalFamily}"\n`);
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    // Test 3: Factual tone for patient (might seem cold/uncaring)
+    console.log('🎭 Test 3: Factual tone for patient (no empathy)\n');
+    console.log('❓ Question: Does the dry, factual tone work for patients?\n');
+    try {
+        const factualPatient = await generator.summariseWithAI(
+            'This Week',
+            'Head',
+            summary.frequency,
+            summary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.FACTUAL,
+                audience: SummaryAudience.PATIENT,
+                fallbackEnabled: true
+            },
+            summary.dateRange
+        );
+        console.log(`Factual + Patient:\n"${factualPatient}"\n`);
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    // Test 4: Compassionate tone for research (inappropriate emotion for scientific context)
+    console.log('🎭 Test 4: Compassionate tone for research context\n');
+    console.log('❓ Question: Does compassion interfere with scientific objectivity?\n');
+    try {
+        const compassionateResearch = await generator.summariseWithAI(
+            'This Week',
+            'Head',
+            summary.frequency,
+            summary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.COMPASSIONATE,
+                audience: SummaryAudience.RESEARCH,
+                fallbackEnabled: true
+            },
+            summary.dateRange
+        );
+        console.log(`Compassionate + Research:\n"${compassionateResearch}"\n`);
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    // Test 5: Test with minimal pain but encouraging tone
+    const minimalPainData: PainDataMaps = {
+        'Today': [
+            { region: 'Finger', painScore: 1, timestamp: new Date('2024-01-21T10:00:00') },
+            { region: 'Finger', painScore: 1, timestamp: new Date('2024-01-21T14:00:00') }
+        ]
+    };
+
+    const minimalSummary = generator.sumRegion('Today', minimalPainData, 'Finger');
+    console.log('🎭 Test 5: Encouraging tone with minimal pain (1/10)\n');
+    console.log('❓ Question: Does encouragement make sense for very low pain?\n');
+    try {
+        const encouragingMinimal = await generator.summariseWithAI(
+            'Today',
+            'Finger',
+            minimalSummary.frequency,
+            minimalSummary.medianScore,
+            testConfig,
+            {
+                tone: SummaryTone.ENCOURAGING,
+                audience: SummaryAudience.PATIENT,
+                fallbackEnabled: true
+            },
+            minimalSummary.dateRange
+        );
+        console.log(`Encouraging + Minimal Pain:\n"${encouragingMinimal}"\n`);
+    } catch (error) {
+        console.log(`Error: ${(error as Error).message}\n`);
+    }
+
+    console.log('✅ Edge Case Test Complete: Extreme Tones\n');
 }
 
 // Export functions for external use
@@ -698,8 +890,9 @@ export {
     testApiKeyValidation,
     testToneAndAudienceVariations,
     testScenario1_PatientSelfTracking,
-    testScenario2_CaregiverMonitoring,
-    testScenario3_ResearchDataCollection,
+    testScenario2_ResearchDataCollection,
+    testEdgeCase_SingleDataPoint,
+    testEdgeCase_ExtremeTones,
     displayMockDataStats,
     mockPainData,
     testConfig
@@ -718,20 +911,23 @@ if (require.main === module) {
         testMapSummaryGeneration().then(() => {
             testToneAndAudienceVariations().then(() => {
                 testScenario1_PatientSelfTracking().then(() => {
-                    testScenario2_CaregiverMonitoring().then(() => {
-                        testScenario3_ResearchDataCollection().then(() => {
-                            testErrorHandling().then(() => {
-                                console.log('\n' + '='.repeat(80));
-                                console.log('✅ ALL TESTS COMPLETED SUCCESSFULLY');
-                                console.log('='.repeat(80));
-                                console.log('\nTest Summary:');
-                                console.log('  • Basic Tests: ✅');
-                                console.log('  • Tone & Audience Variations: ✅');
-                                console.log('  • Scenario 1 (Patient Self-Tracking): ✅');
-                                console.log('  • Scenario 2 (Caregiver Monitoring): ✅');
-                                console.log('  • Scenario 3 (Research Data Collection): ✅');
-                                console.log('  • Error Handling: ✅');
-                                console.log('');
+                    testScenario2_ResearchDataCollection().then(() => {
+                        testEdgeCase_SingleDataPoint().then(() => {
+                            testEdgeCase_ExtremeTones().then(() => {
+                                testErrorHandling().then(() => {
+                                    console.log('\n' + '='.repeat(80));
+                                    console.log('✅ ALL TESTS COMPLETED SUCCESSFULLY');
+                                    console.log('='.repeat(80));
+                                    console.log('\nTest Summary:');
+                                    console.log('  • Basic Tests: ✅');
+                                    console.log('  • Tone & Audience Variations: ✅');
+                                    console.log('  • Scenario 1 (Patient Self-Tracking): ✅');
+                                    console.log('  • Scenario 2 (Research Data Collection): ✅');
+                                    console.log('  • Edge Case: Single Data Point: ✅');
+                                    console.log('  • Edge Case: Extreme Tones: ✅');
+                                    console.log('  • Error Handling: ✅');
+                                    console.log('');
+                                });
                             });
                         });
                     });

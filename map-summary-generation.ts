@@ -260,6 +260,37 @@ export class MapSummaryGeneration {
         
         const toneGuidance = this.getToneGuidance(tone);
         
+        // Special handling for zero entries
+        if (frequency === 0) {
+            return `You are a data analysis AI assistant. Generate a ${tone} summary about pain tracking data for a ${audience}.
+
+${toneGuidance}
+
+Data Context:
+- Time Period: ${period}
+${dateContext ? dateContext + '\n' : ''}- Body Region: ${region}
+- Number of pain entries: ${frequency}
+
+CRITICAL: The number of entries is ZERO (0). This means the user has NOT LOGGED ANY DATA for this region during this period. 
+They have not tracked or recorded any pain for the ${region} region yet.
+
+DO NOT say:
+- "You experienced no pain" or "You're pain-free"
+- "That's wonderful" or congratulate them
+- Anything that implies they had pain but it was low
+
+DO say:
+- "You haven't logged any data yet for ${region}"
+- "No entries have been recorded for ${region}"
+- "You haven't tracked ${region} pain during this period"
+
+${audienceContext}
+
+${toneInstructions}
+
+The tone you use MUST be distinctly ${tone}. Generate a brief summary (1-2 sentences) explaining that no data has been logged yet for this region:`;
+        }
+        
         return `You are a data analysis AI assistant. Generate a ${tone} summary about pain tracking data for a ${audience}.
 
 ${toneGuidance}
@@ -768,6 +799,11 @@ The tone you use MUST be distinctly ${tone}. Make sure your language clearly ref
      * Generates a fallback summary when API fails
      */
     private generateFallbackSummary(period: string, region: string, frequency: number, medianScore: number): string {
+        // Special handling for zero entries
+        if (frequency === 0) {
+            return `You haven't logged any pain data for your ${region.toLowerCase()} during ${period.toLowerCase()} yet. When you start tracking this region, your data will appear here.`;
+        }
+        
         const severity = this.getSeverityDescription(medianScore);
         const frequencyDesc = frequency === 1 ? 'entry' : 'entries';
         

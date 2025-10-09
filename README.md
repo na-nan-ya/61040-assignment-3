@@ -1,149 +1,25 @@
-# MapSummaryGeneration
+**Assignment 3 Answers**
 
-A TypeScript module for generating natural language summaries of body map pain data with customizable tone and audience options.
+1. User Journey
 
-## Concept: MapSummaryGeneration
+A user has been logging moderate-to-severe knee pain in their BodyMaps almost everyday for a month now. The user's doctor has advised them to only schedule an appointment when the pain has been consistently bad for a month. The user taps the already highlighted knee region of that day's BodyMap and selects the last month's date range, an encouraging tone, and a patient (i.e. user) audience. They want to feel validated that they are not exaggerating the pain in their head. Now, instead of a bland single-sentence stats summary, the summary commends them for consistently logging their pain and presents the numbers. The user screenshots it for their own reference. Then, they repeat the process but select a factual tone and a healthcare professional audience for the summary to be directed at. This time, it is a concsise, professional summary that illustrates the patient's pain. They schedule an appointment and screenshot this as well to show to their PCP.
 
-**Purpose**: Transform pain tracking data into readable summaries for different audiences  
-**Principle**: Take structured pain data (region, frequency, scores) and generate appropriate summaries based on who will read them
+[UX Sketch]()
 
-### Core Features
-- **Statistical Analysis**: Compute frequency and median pain scores for body regions
-- **Customizable Output**: Generate summaries with different tones and for different audiences
-- **Data Validation**: Ensure summaries accurately reflect input data without hallucinations
-- **Error Handling**: Automatic retries with fallback to generic summaries
+2. 3 test cases
 
-### Main Functions
-- `sumRegion(period, maps, region)` - Calculate pain statistics for a specific region
-- `summariseWithAI(period, region, frequency, medianScore, config, options)` - Generate natural language summary
+- Single datapoint: The user was recommended this app by a friend and decided to try it. However, they only logged moderate pain in their left leg on the first night they downloaded it. They don't really understand how the summary is meant to be used so they request an LLM-generated summary the very next day. As expected, the LLM was still able to generate a frequency and 'median' score based on the single datapoint. There were no issues encountered with this. However, there could be a function that prompts the LLM to remind the user to log more data for better results based on the size of the given dataset per region whose summary is requested.
 
-## Prerequisites
+- Emotional tone mismatch: The user has been experiencing severe pain in their right leg for 3 days. They request a summary with an encouraging tone for a patient audience. When given a severe pain score and an 'optimistic' tone, the LLM failed the validation checks. It kept providing medical advice in response to the severity of the score or ommitted data in favour of comforting the user, resulting in the fallback string summary being used multiple times. This is still an outstanding issue because, given the sequence of actions and general user freedom, I don't want to limit which tones the user can choose.
 
-- **Node.js** (version 14 or higher)
-- **TypeScript** (will be installed automatically)
-- **API Key** for natural language generation (free at [Google AI Studio](https://makersuite.google.com/app/apikey))
+- No data: In contrast to the single datapoint case, this requires a separate kind out output. The user has not logged any data for a region yet but mistakenly generates a summary for it. In this case, since the LLM summary fails the validator check, there is alternative fallback String summary that explains that they have not logged anything yet (not that any pain was logged but just low!).
 
-## Quick Setup
+Note: The 'scenarios' in the code just illustrate potential use-cases with the user journey, they are not meant to be test cases!
 
-### 1. Install Dependencies
+3. Validators
 
-```bash
-npm install
-```
+- Issue 1: Hallucinates regions that were not in the requested data and makes up numbers for them. For example, when asked to summarise a user's lower back pain, it would also include a mention of neck pain and a fake median score of 6.5. This was fixed by creating a set of common body regions and checking the output to see if it contained any of these regions that weren't in the relevant data (function: regionValidation).
 
-### 2. Configure API Access
+- Issue 2: Not including all the relevant information. When the tone was changed, it sometimes omitted the actual important information like frequency and median score in favour of encouraging statements, for example. The code remedies this by checking for mentions of the words 'median' and 'frequency', then throws an error and regenerates the summary if it doesn't contain both (function: numericalValidation).
 
-Copy the template and add your API key:
-
-```bash
-cp config.json.template config.json
-```
-
-Edit `config.json`:
-```json
-{
-  "apiKey": "YOUR_API_KEY_HERE"
-}
-```
-
-Get your API key at [Google AI Studio](https://makersuite.google.com/app/apikey)
-
-### 3. Run the Application
-
-**Run all tests:**
-```bash
-npm start
-```
-
-**Run individual scenarios:**
-```bash
-npm run scenario1    # Patient self-tracking
-npm run scenario2    # Caregiver monitoring
-npm run scenario3    # Research data collection
-```
-
-## File Structure
-
-```
-├── package.json                  # Dependencies and scripts
-├── tsconfig.json                 # TypeScript configuration
-├── config.json                   # API key configuration
-├── map-summary-generation.ts     # Core module
-├── map-summary-test.ts           # Test scenarios
-└── dist/                         # Compiled JavaScript output
-```
-
-## Test Scenarios
-
-The module includes three comprehensive test scenarios demonstrating real-world usage:
-
-### Scenario 1: Patient Self-Tracking
-Sarah (User 1) tracks her lower back pain over 2 weeks, comparing pain levels before and after ergonomic adjustments. Generates compassionate summaries for herself and clinical summaries for her doctor.
-
-### Scenario 2: Caregiver Monitoring
-User 2 tracks their parent's arthritis pain across multiple body regions. Generates summaries for caregiving, family updates, and professional healthcare reports.
-
-### Scenario 3: Research Data Collection
-User 3 collects standardized pain data for clinical research, generating objective summaries suitable for academic publication and research analysis.
-
-## Usage Example
-
-```typescript
-import { MapSummaryGeneration, SummaryTone, SummaryAudience } from './map-summary-generation';
-
-const generator = new MapSummaryGeneration({ apiKey: 'your-api-key' });
-
-// Calculate statistics
-const stats = generator.sumRegion('Last Week', painData, 'Lower Back');
-
-// Generate summary for patient
-const patientSummary = await generator.summariseWithAI(
-    'Last Week', 'Lower Back', stats.frequency, stats.medianScore, config,
-    { tone: SummaryTone.COMPASSIONATE, audience: SummaryAudience.PATIENT }
-);
-
-// Generate summary for doctor
-const doctorSummary = await generator.summariseWithAI(
-    'Last Week', 'Lower Back', stats.frequency, stats.medianScore, config,
-    { tone: SummaryTone.CLINICAL, audience: SummaryAudience.DOCTOR }
-);
-```
-
-## Customization Options
-
-**Tones**: Compassionate, Professional, Clinical, Encouraging, Factual  
-**Audiences**: Patient, Doctor, Caregiver, Family, Research
-
-## Validation System
-
-The module automatically validates generated summaries to prevent:
-- Hallucinated body regions or data
-- Missing numerical information
-- Inconsistent descriptors
-- Medical advice or diagnoses
-
-## Troubleshooting
-
-### "Could not load config.json"
-- Ensure `config.json` exists with your API key
-- Check JSON format is correct
-
-### API Errors
-- Verify API key is correct
-- Check internet connection
-- Ensure API access is enabled
-
-### Build Issues
-- Run `npm run build` to compile TypeScript
-- Reinstall dependencies with `npm install`
-
-## Technical Details
-
-- **Language**: TypeScript
-- **Module System**: CommonJS
-- **Testing**: Integrated scenarios with realistic workflows
-- **Validation**: Automated checks for output accuracy
-
-## License
-
-MIT
+- Issue 3: It attempts to provide medical advice or push the user to act in a certain way. For example, it would suggest potential home remedies for neck pain. The summary (and the app as a whole) is not intended to substitute a medical professional in any way, it is simply a data-driven tool. The code checks the summary for commonly used phrases in diagnosis/prognosis such as 'this indicates that' or 'you could attempt' and fails the summary's validation check if it does (function: medicalAdviceCheck).
