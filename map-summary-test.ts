@@ -223,10 +223,6 @@ async function testErrorHandling() {
 async function testApiKeyValidation() {
     console.log('\n🔑 Testing API Key Validation:\n');
     
-    console.log('Current API Key (first 10 chars):', testConfig.apiKey.substring(0, 10) + '...');
-    console.log('API Key length:', testConfig.apiKey.length);
-    console.log('API Key starts with AIzaSy:', testConfig.apiKey.startsWith('AIzaSy'));
-    
     // Test a simple API call
     try {
         const generator = createMapSummaryGenerator(testConfig);
@@ -347,11 +343,11 @@ function displayMockDataStats() {
  * SCENARIO 1: Patient Self-Tracking Journey
  * 
  * User Story:
- * Sarah is a 35-year-old office worker who experiences chronic lower back pain.
+ * User 1 is a 35-year-old office worker who experiences chronic lower back pain.
  * She wants to understand her pain patterns to discuss with her doctor.
  * 
  * User Actions Sequence:
- * 1. Sarah tracks her lower back pain daily for 2 weeks
+ * 1. User 1 tracks her lower back pain daily for 2 weeks
  * 2. Week 1: High pain due to poor posture at new desk setup
  * 3. Week 2: Improved pain after ergonomic adjustments
  * 4. She wants a compassionate summary to understand her progress
@@ -361,10 +357,10 @@ async function testScenario1_PatientSelfTracking() {
     console.log('\n' + '='.repeat(80));
     console.log('SCENARIO 1: Patient Self-Tracking Journey');
     console.log('='.repeat(80));
-    console.log('\nUser: Sarah, 35-year-old office worker with chronic lower back pain');
+    console.log('\nUser: User 1, 35-year-old office worker with chronic lower back pain');
     console.log('Goal: Track pain patterns and share with doctor\n');
 
-    const sarahsPainData: PainDataMaps = {
+    const User1PainData: PainDataMaps = {
         'Week 1 (Before Ergonomic Adjustments)': [
             { region: 'Lower Back', painScore: 8, timestamp: new Date('2024-01-01T09:00:00') },
             { region: 'Lower Back', painScore: 7, timestamp: new Date('2024-01-01T17:00:00') },
@@ -386,15 +382,15 @@ async function testScenario1_PatientSelfTracking() {
 
     const generator = createMapSummaryGenerator(testConfig);
 
-    console.log('📊 Action 1: Sarah reviews her first week of pain tracking\n');
-    const week1Summary = generator.sumRegion('Week 1 (Before Ergonomic Adjustments)', sarahsPainData, 'Lower Back');
+    console.log('📊 Action 1: User1 reviews her first week of pain tracking\n');
+    const week1Summary = generator.sumRegion('Week 1 (Before Ergonomic Adjustments)', User1PainData, 'Lower Back');
     console.log(`Data Summary:
    - Period: Week 1 (Before Ergonomic Adjustments)
    - Region: ${week1Summary.region}
    - Frequency: ${week1Summary.frequency} entries
    - Median Score: ${week1Summary.medianScore}/10\n`);
 
-    console.log('🤖 LLM Action 1a: Generate compassionate summary for patient (Sarah)\n');
+    console.log('🤖 LLM Action 1a: Generate compassionate summary for patient (User1)\n');
     try {
         const compassionateSummary = await generator.summariseWithAI(
             'Week 1 (Before Ergonomic Adjustments)',
@@ -409,13 +405,13 @@ async function testScenario1_PatientSelfTracking() {
             },
             week1Summary.dateRange
         );
-        console.log(`Summary for Sarah:\n"${compassionateSummary}"\n`);
+        console.log(`Summary for User 1:\n"${compassionateSummary}"\n`);
     } catch (error) {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 2: Sarah reviews her second week (after ergonomic adjustments)\n');
-    const week2Summary = generator.sumRegion('Week 2 (After Ergonomic Adjustments)', sarahsPainData, 'Lower Back');
+    console.log('📊 Action 2: User 1 reviews her second week (after ergonomic adjustments)\n');
+    const week2Summary = generator.sumRegion('Week 2 (After Ergonomic Adjustments)', User1PainData, 'Lower Back');
     console.log(`Data Summary:
    - Period: Week 2 (After Ergonomic Adjustments)
    - Region: ${week2Summary.region}
@@ -442,7 +438,7 @@ async function testScenario1_PatientSelfTracking() {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 3: Sarah prepares clinical summary for doctor appointment\n');
+    console.log('📊 Action 3: User 1 prepares clinical summary for doctor appointment\n');
     console.log('🤖 LLM Action 1c: Generate clinical summary for healthcare provider\n');
     try {
         const clinicalSummary = await generator.summariseWithAI(
@@ -472,21 +468,21 @@ async function testScenario1_PatientSelfTracking() {
  * SCENARIO 2: Caregiver Monitoring Elderly Parent
  * 
  * User Story:
- * Michael is caring for his 72-year-old mother who has arthritis in multiple joints.
- * He tracks her pain to help manage her care and communicate with her healthcare team.
+ * User 2 is caring for their 72-year-old parent who has arthritis in multiple joints.
+ * They track pain to help manage care and communicate with the healthcare team.
  * 
  * User Actions Sequence:
- * 1. Michael tracks his mother's pain across multiple regions
- * 2. He notices knee pain is most frequent and severe
- * 3. He wants to understand patterns to adjust daily activities
- * 4. He needs to share data with family members
- * 5. He prepares a professional report for the doctor
+ * 1. User 2 tracks parent's pain across multiple regions
+ * 2. They notice knee pain is most frequent and severe
+ * 3. They want to understand patterns to adjust daily activities
+ * 4. They need to share data with family members
+ * 5. They prepare a professional report for the doctor
  */
 async function testScenario2_CaregiverMonitoring() {
     console.log('\n' + '='.repeat(80));
     console.log('SCENARIO 2: Caregiver Monitoring Elderly Parent');
     console.log('='.repeat(80));
-    console.log('\nUser: Michael, caregiver for his 72-year-old mother with arthritis');
+    console.log('\nUser: User 2, caregiver for elderly parent with arthritis');
     console.log('Goal: Track multi-region pain and coordinate care\n');
 
     const mothersPainData: PainDataMaps = {
@@ -505,7 +501,7 @@ async function testScenario2_CaregiverMonitoring() {
 
     const generator = createMapSummaryGenerator(testConfig);
 
-    console.log('📊 Action 1: Michael reviews knee pain data (most severe)\n');
+    console.log('📊 Action 1: User 2 reviews knee pain data (most severe)\n');
     const kneeSummary = generator.sumRegion('This Month', mothersPainData, 'Knees');
     console.log(`Data Summary:
    - Region: ${kneeSummary.region}
@@ -527,12 +523,12 @@ async function testScenario2_CaregiverMonitoring() {
             },
             kneeSummary.dateRange
         );
-        console.log(`Summary for Caregiver (Michael):\n"${caregiverSummary}"\n`);
+        console.log(`Summary for Caregiver (User 2):\n"${caregiverSummary}"\n`);
     } catch (error) {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 2: Michael prepares update for family members\n');
+    console.log('📊 Action 2: User 2 prepares update for family members\n');
     console.log('🤖 LLM Action 2b: Generate clear summary for family members\n');
     try {
         const familySummary = await generator.summariseWithAI(
@@ -553,7 +549,7 @@ async function testScenario2_CaregiverMonitoring() {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 3: Michael prepares professional report for doctor\n');
+    console.log('📊 Action 3: User 2 prepares professional report for doctor\n');
     console.log('🤖 LLM Action 2c: Generate professional report for healthcare provider\n');
     try {
         const doctorReport = await generator.summariseWithAI(
@@ -583,21 +579,21 @@ async function testScenario2_CaregiverMonitoring() {
  * SCENARIO 3: Research Study Data Collection
  * 
  * User Story:
- * Dr. Lisa Chen is conducting a clinical research study on chronic pain patterns.
- * She collects pain data from study participants and needs objective summaries
+ * User 3 is conducting a clinical research study on chronic pain patterns.
+ * They collect pain data from study participants and need objective summaries
  * for research analysis and publications.
  * 
  * User Actions Sequence:
  * 1. Research participant tracks pain using standardized protocol
  * 2. Data is collected for neck pain over 4 weeks
- * 3. Dr. Chen needs factual summaries for research analysis
- * 4. She requires objective language for publication
+ * 3. User 3 needs factual summaries for research analysis
+ * 4. They require objective language for publication
  */
 async function testScenario3_ResearchDataCollection() {
     console.log('\n' + '='.repeat(80));
     console.log('SCENARIO 3: Research Study Data Collection');
     console.log('='.repeat(80));
-    console.log('\nUser: Dr. Lisa Chen, clinical researcher studying chronic pain');
+    console.log('\nUser: User 3, clinical researcher studying chronic pain');
     console.log('Goal: Collect and analyze standardized pain data for research\n');
 
     const studyParticipantData: PainDataMaps = {
@@ -629,7 +625,7 @@ async function testScenario3_ResearchDataCollection() {
 
     const generator = createMapSummaryGenerator(testConfig);
 
-    console.log('📊 Action 1: Dr. Chen analyzes baseline data (pre-intervention)\n');
+    console.log('📊 Action 1: User 3 analyzes baseline data (pre-intervention)\n');
     const baselineSummary = generator.sumRegion('Baseline (Weeks 1-2)', studyParticipantData, 'Neck');
     console.log(`Data Summary:
    - Study Period: Baseline (Weeks 1-2)
@@ -657,7 +653,7 @@ async function testScenario3_ResearchDataCollection() {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 2: Dr. Chen analyzes post-intervention data\n');
+    console.log('📊 Action 2: User 3 analyzes post-intervention data\n');
     const postSummary = generator.sumRegion('Post-Intervention (Weeks 3-4)', studyParticipantData, 'Neck');
     console.log(`Data Summary:
    - Study Period: Post-Intervention (Weeks 3-4)
@@ -685,7 +681,7 @@ async function testScenario3_ResearchDataCollection() {
         console.log(`Error: ${(error as Error).message}\n`);
     }
 
-    console.log('📊 Action 3: Dr. Chen prepares comparative analysis\n');
+    console.log('📊 Action 3: User 3 prepares comparative analysis\n');
     console.log(`Comparative Statistics:
    - Baseline Median: ${baselineSummary.medianScore}/10
    - Post-Intervention Median: ${postSummary.medianScore}/10

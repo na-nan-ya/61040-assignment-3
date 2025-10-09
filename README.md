@@ -78,13 +78,13 @@ npm run scenario3    # Research data collection
 The module includes three comprehensive test scenarios demonstrating real-world usage:
 
 ### Scenario 1: Patient Self-Tracking
-Sarah tracks her lower back pain over 2 weeks, comparing pain levels before and after ergonomic adjustments. Generates compassionate summaries for herself and clinical summaries for her doctor.
+Sarah (User 1) tracks her lower back pain over 2 weeks, comparing pain levels before and after ergonomic adjustments. Generates compassionate summaries for herself and clinical summaries for her doctor.
 
 ### Scenario 2: Caregiver Monitoring
-Michael tracks his mother's arthritis pain across multiple body regions. Generates summaries for caregiving, family updates, and professional healthcare reports.
+User 2 tracks their parent's arthritis pain across multiple body regions. Generates summaries for caregiving, family updates, and professional healthcare reports.
 
 ### Scenario 3: Research Data Collection
-Dr. Chen collects standardized pain data for clinical research, generating objective summaries suitable for academic publication and research analysis.
+User 3 collects standardized pain data for clinical research, generating objective summaries suitable for academic publication and research analysis.
 
 ## Usage Example
 
