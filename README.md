@@ -1,33 +1,29 @@
-# DayPlanner 
-A simple day planner. This implementation focuses on the core concept of organizing activities for a single day with both manual and AI-assisted scheduling.
+# MapSummaryGeneration
 
-## Concept: DayPlanner
+A TypeScript module for generating natural language summaries of body map pain data with customizable tone and audience options.
 
-**Purpose**: Help you organize activities for a single day  
-**Principle**: You can add activities one at a time, assign them to times, and then observe the completed schedule
+## Concept: MapSummaryGeneration
 
-### Core State
-- **Activities**: Set of activities with title, duration, and optional startTime
-- **Assignments**: Set of activity-to-time assignments
-- **Time System**: All times in half-hour slots starting at midnight (0 = 12:00 AM, 13 = 6:30 AM)
+**Purpose**: Transform pain tracking data into readable summaries for different audiences  
+**Principle**: Take structured pain data (region, frequency, scores) and generate appropriate summaries based on who will read them
 
-### Core Actions
-- `addActivity(title: string, duration: number): Activity`
-- `removeActivity(activity: Activity)`
-- `assignActivity(activity: Activity, startTime: number)`
-- `unassignActivity(activity: Activity)`
-- `requestAssignmentsFromLLM()` - AI-assisted scheduling with hardwired preferences
+### Core Features
+- **Statistical Analysis**: Compute frequency and median pain scores for body regions
+- **Customizable Output**: Generate summaries with different tones and for different audiences
+- **Data Validation**: Ensure summaries accurately reflect input data without hallucinations
+- **Error Handling**: Automatic retries with fallback to generic summaries
+
+### Main Functions
+- `sumRegion(period, maps, region)` - Calculate pain statistics for a specific region
+- `summariseWithAI(period, region, frequency, medianScore, config, options)` - Generate natural language summary
 
 ## Prerequisites
 
 - **Node.js** (version 14 or higher)
 - **TypeScript** (will be installed automatically)
-- **Google Gemini API Key** (free at [Google AI Studio](https://makersuite.google.com/app/apikey))
+- **API Key** for natural language generation (free at [Google AI Studio](https://makersuite.google.com/app/apikey))
 
 ## Quick Setup
-
-### 0. Clone the repo locally and navigate to it
-```cd intro-gemini-schedule```
 
 ### 1. Install Dependencies
 
@@ -35,121 +31,96 @@ A simple day planner. This implementation focuses on the core concept of organiz
 npm install
 ```
 
-### 2. Add Your API Key
+### 2. Configure API Access
 
-**Why use a template?** The `config.json` file contains your private API key and should never be committed to version control. The template approach lets you:
-- Keep the template file in git (safe to share)
-- Create your own `config.json` locally (keeps your API key private)
-- Easily set up the project on any machine
+Copy the template and add your API key:
 
-**Step 1:** Copy the template file:
 ```bash
 cp config.json.template config.json
 ```
 
-**Step 2:** Edit `config.json` and add your API key:
+Edit `config.json`:
 ```json
 {
-  "apiKey": "YOUR_GEMINI_API_KEY_HERE"
+  "apiKey": "YOUR_API_KEY_HERE"
 }
 ```
 
-**To get your API key:**
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the key and paste it into `config.json` (replacing `YOUR_GEMINI_API_KEY_HERE`)
+Get your API key at [Google AI Studio](https://makersuite.google.com/app/apikey)
 
 ### 3. Run the Application
 
-**Run all test cases:**
+**Run all tests:**
 ```bash
 npm start
 ```
 
-**Run specific test cases:**
+**Run individual scenarios:**
 ```bash
-npm run manual    # Manual scheduling only
-npm run llm       # LLM-assisted scheduling only
-npm run mixed     # Mixed manual + LLM scheduling
+npm run scenario1    # Patient self-tracking
+npm run scenario2    # Caregiver monitoring
+npm run scenario3    # Research data collection
 ```
 
 ## File Structure
 
 ```
-dayplanner/
-├── package.json              # Dependencies and scripts
-├── tsconfig.json             # TypeScript configuration
-├── config.json               # Your Gemini API key
-├── dayplanner-types.ts       # Core type definitions
-├── dayplanner.ts             # DayPlanner class implementation
-├── dayplanner-llm.ts         # LLM integration
-├── dayplanner-tests.ts       # Test cases and examples
-├── dist/                     # Compiled JavaScript output
-└── README.md                 # This file
+├── package.json                  # Dependencies and scripts
+├── tsconfig.json                 # TypeScript configuration
+├── config.json                   # API key configuration
+├── map-summary-generation.ts     # Core module
+├── map-summary-test.ts           # Test scenarios
+└── dist/                         # Compiled JavaScript output
 ```
 
-## Test Cases
+## Test Scenarios
 
-The application includes three comprehensive test cases:
+The module includes three comprehensive test scenarios demonstrating real-world usage:
 
-### 1. Manual Scheduling
-Demonstrates adding activities and manually assigning them to time slots:
+### Scenario 1: Patient Self-Tracking
+Sarah tracks her lower back pain over 2 weeks, comparing pain levels before and after ergonomic adjustments. Generates compassionate summaries for herself and clinical summaries for her doctor.
+
+### Scenario 2: Caregiver Monitoring
+Michael tracks his mother's arthritis pain across multiple body regions. Generates summaries for caregiving, family updates, and professional healthcare reports.
+
+### Scenario 3: Research Data Collection
+Dr. Chen collects standardized pain data for clinical research, generating objective summaries suitable for academic publication and research analysis.
+
+## Usage Example
 
 ```typescript
-const planner = new DayPlanner();
-const breakfast = planner.addActivity('Breakfast', 1); // 30 minutes
-planner.assignActivity(breakfast, 14); // 7:00 AM
+import { MapSummaryGeneration, SummaryTone, SummaryAudience } from './map-summary-generation';
+
+const generator = new MapSummaryGeneration({ apiKey: 'your-api-key' });
+
+// Calculate statistics
+const stats = generator.sumRegion('Last Week', painData, 'Lower Back');
+
+// Generate summary for patient
+const patientSummary = await generator.summariseWithAI(
+    'Last Week', 'Lower Back', stats.frequency, stats.medianScore, config,
+    { tone: SummaryTone.COMPASSIONATE, audience: SummaryAudience.PATIENT }
+);
+
+// Generate summary for doctor
+const doctorSummary = await generator.summariseWithAI(
+    'Last Week', 'Lower Back', stats.frequency, stats.medianScore, config,
+    { tone: SummaryTone.CLINICAL, audience: SummaryAudience.DOCTOR }
+);
 ```
 
-### 2. LLM-Assisted Scheduling
-Shows AI-powered scheduling with hardwired preferences:
+## Customization Options
 
-```typescript
-const planner = new DayPlanner();
-planner.addActivity('Morning Jog', 2);
-planner.addActivity('Math Homework', 4);
-await llm.requestAssignmentsFromLLM(planner);
-```
+**Tones**: Compassionate, Professional, Clinical, Encouraging, Factual  
+**Audiences**: Patient, Doctor, Caregiver, Family, Research
 
-### 3. Mixed Scheduling
-Combines manual assignments with AI assistance for remaining activities.
+## Validation System
 
-## Sample Output
-
-```
-📅 Daily Schedule
-==================
-7:00 AM - Breakfast (30 min)
-8:00 AM - Morning Workout (1 hours)
-10:00 AM - Study Session (1.5 hours)
-1:00 PM - Lunch (30 min)
-3:00 PM - Team Meeting (1 hours)
-7:00 PM - Dinner (30 min)
-9:00 PM - Evening Reading (1 hours)
-
-📋 Unassigned Activities
-========================
-All activities are assigned!
-```
-
-## Key Features
-
-- **Simple State Management**: Activities and assignments stored in memory
-- **Flexible Time System**: Half-hour slots from midnight (0-47)
-- **Query-Based Display**: Schedule generated on-demand, not stored sorted
-- **AI Integration**: Hardwired preferences in LLM prompt (no external hints)
-- **Conflict Detection**: Prevents overlapping activities
-- **Clean Architecture**: First principles implementation with no legacy code
-
-## LLM Preferences (Hardwired)
-
-The AI uses these built-in preferences:
-- Exercise activities: Morning (6:00 AM - 10:00 AM)
-- Study/Classes: Focused hours (9:00 AM - 5:00 PM)
-- Meals: Regular intervals (breakfast 7-9 AM, lunch 12-1 PM, dinner 6-8 PM)
-- Social/Relaxation: Evenings (6:00 PM - 10:00 PM)
-- Avoid: Demanding activities after 10:00 PM
+The module automatically validates generated summaries to prevent:
+- Hallucinated body regions or data
+- Missing numerical information
+- Inconsistent descriptors
+- Medical advice or diagnoses
 
 ## Troubleshooting
 
@@ -157,26 +128,22 @@ The AI uses these built-in preferences:
 - Ensure `config.json` exists with your API key
 - Check JSON format is correct
 
-### "Error calling Gemini API"
+### API Errors
 - Verify API key is correct
 - Check internet connection
-- Ensure API access is enabled in Google AI Studio
+- Ensure API access is enabled
 
 ### Build Issues
-- Use `npm run build` to compile TypeScript
-- Check that all dependencies are installed with `npm install`
+- Run `npm run build` to compile TypeScript
+- Reinstall dependencies with `npm install`
 
-## Next Steps
+## Technical Details
 
-Try extending the DayPlanner:
-- Add weekly scheduling
-- Implement activity categories
-- Add location information
-- Create a web interface
-- Add conflict resolution strategies
-- Implement recurring activities
+- **Language**: TypeScript
+- **Module System**: CommonJS
+- **Testing**: Integrated scenarios with realistic workflows
+- **Validation**: Automated checks for output accuracy
 
-## Resources
+## License
 
-- [Google Generative AI Documentation](https://ai.google.dev/docs)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+MIT
