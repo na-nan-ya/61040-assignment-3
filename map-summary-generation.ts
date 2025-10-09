@@ -34,6 +34,10 @@ export interface RegionSummary {
     frequency: number;
     medianScore: number;
     totalEntries: number;
+    dateRange?: {
+        start: Date;
+        end: Date;
+    };
 }
 
 /**
@@ -128,12 +132,20 @@ export class MapSummaryGeneration {
         const scores = regionData.map(entry => entry.painScore).sort((a, b) => a - b);
         const medianScore = this.calculateMedian(scores);
 
+        // Calculate date range
+        const timestamps = regionData.map(entry => entry.timestamp).sort((a, b) => a.getTime() - b.getTime());
+        const dateRange = timestamps.length > 0 ? {
+            start: timestamps[0],
+            end: timestamps[timestamps.length - 1]
+        } : undefined;
+
         return {
             region,
             period,
             frequency,
             medianScore,
-            totalEntries: regionData.length
+            totalEntries: regionData.length,
+            dateRange
         };
     }
 
@@ -145,6 +157,7 @@ export class MapSummaryGeneration {
      * @param medianScore - Median pain score for the region
      * @param config - API configuration
      * @param options - Additional options for summary generation including tone and audience
+     * @param dateRange - Optional date range for the data
      * @returns Promise<string> - AI-generated summary
      */
     async summariseWithAI(
@@ -153,7 +166,8 @@ export class MapSummaryGeneration {
         frequency: number, 
         medianScore: number, 
         config: Config,
-        options: SummaryOptions = {}
+        options: SummaryOptions = {},
+        dateRange?: { start: Date; end: Date }
     ): Promise<string> {
         const maxRetries = options.maxRetries || this.maxRetries;
         const retryDelay = options.retryDelay || this.retryDelay;
@@ -162,7 +176,7 @@ export class MapSummaryGeneration {
         const audience = options.audience || SummaryAudience.PATIENT;
 
         // Create the prompt for Gemini with tone and audience
-        const prompt = this.createSummaryPrompt(period, region, frequency, medianScore, tone, audience);
+        const prompt = this.createSummaryPrompt(period, region, frequency, medianScore, tone, audience, dateRange);
 
         const enableValidation = options.enableValidation !== false; // Default to true
 
@@ -230,16 +244,29 @@ export class MapSummaryGeneration {
         frequency: number, 
         medianScore: number,
         tone: SummaryTone = SummaryTone.COMPASSIONATE,
-        audience: SummaryAudience = SummaryAudience.PATIENT
+        audience: SummaryAudience = SummaryAudience.PATIENT,
+        dateRange?: { start: Date; end: Date }
     ): string {
         const toneInstructions = this.getToneInstructions(tone, audience);
         const audienceContext = this.getAudienceContext(audience);
         
+        // Format date range if available
+        let dateContext = '';
+        if (dateRange) {
+            const startDate = dateRange.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const endDate = dateRange.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            dateContext = `- Specific Date Range: ${startDate} to ${endDate}`;
+        }
+        
+        const toneGuidance = this.getToneGuidance(tone);
+        
         return `You are a data analysis AI assistant. Generate a ${tone} summary about pain tracking data for a ${audience}.
+
+${toneGuidance}
 
 Data Context:
 - Time Period: ${period}
-- Body Region: ${region}
+${dateContext ? dateContext + '\n' : ''}- Body Region: ${region}
 - Number of pain entries: ${frequency}
 - Median pain score: ${medianScore}/10
 
@@ -254,7 +281,22 @@ IMPORTANT: This is purely a data summary tool. Do NOT provide:
 - Medical advice of any kind
 - Suggestions for medical intervention
 
-Focus only on presenting the recorded data in an appropriate tone for the audience. Generate a concise data summary:`;
+${dateRange ? 'Include both the relative time period (' + period + ') and the specific dates in your summary.' : ''}
+The tone you use MUST be distinctly ${tone}. Make sure your language clearly reflects this tone. Generate your summary now:`;
+    }
+
+    /**
+     * Gets high-level tone guidance
+     */
+    private getToneGuidance(tone: SummaryTone): string {
+        const guidance = {
+            [SummaryTone.COMPASSIONATE]: `TONE GUIDANCE: Be warm, caring, and empathetic. Think of yourself as a supportive friend who genuinely cares about the person's wellbeing. Use personal, kind language that makes them feel understood and supported.`,
+            [SummaryTone.PROFESSIONAL]: `TONE GUIDANCE: Be neutral and businesslike. Think of yourself as a professional colleague providing a clear, objective report. Avoid emotional language and personal connection.`,
+            [SummaryTone.CLINICAL]: `TONE GUIDANCE: Be formal and technical. Think of yourself as writing for a medical chart or clinical documentation. Use precise medical terminology and formal language.`,
+            [SummaryTone.ENCOURAGING]: `TONE GUIDANCE: Be enthusiastic and motivating! Think of yourself as a cheerleader celebrating their efforts. Use upbeat, positive language with energy and excitement. Make them feel proud of their tracking work!`,
+            [SummaryTone.FACTUAL]: `TONE GUIDANCE: Be completely neutral and objective. Think of yourself as a data printout or statistical report. Use no emotion, no personal connection, just pure facts in the driest possible way.`
+        };
+        return guidance[tone] || guidance[SummaryTone.COMPASSIONATE];
     }
 
     /**
@@ -265,10 +307,13 @@ Focus only on presenting the recorded data in an appropriate tone for the audien
             [SummaryTone.COMPASSIONATE]: {
                 [SummaryAudience.PATIENT]: `Requirements:
 - Keep it concise (2-3 sentences maximum)
-- Use empathetic, patient-friendly language
-- Present only the recorded data
-- Focus on what the numbers show
-- Be supportive without medical advice`,
+- Use warm, caring, empathetic language as if speaking to a friend
+- Address the reader directly with "you" and use personal tone
+- Acknowledge their experience with phrases like "I see", "I understand", "I know this can be..."
+- Express genuine care and concern for their wellbeing
+- Present the data gently and supportively
+- Make them feel heard and validated
+- Be warm and kind without medical advice`,
                 [SummaryAudience.DOCTOR]: `Requirements:
 - Keep it concise and professional
 - Present data clearly and objectively
@@ -296,11 +341,13 @@ Focus only on presenting the recorded data in an appropriate tone for the audien
             },
             [SummaryTone.PROFESSIONAL]: {
                 [SummaryAudience.PATIENT]: `Requirements:
-- Keep it professional but accessible
-- Use clear, non-technical language
-- Focus on the recorded data facts
-- Present information objectively
-- Be informative without medical advice`,
+- Keep it professional but accessible (2-3 sentences)
+- Use clear, neutral, non-technical language
+- Present data in a straightforward, matter-of-fact manner
+- Be informative and direct without emotion
+- Focus strictly on the numbers and facts
+- Avoid personal pronouns like "I" - use "your data shows" instead of "I see"
+- Be informative without medical advice or warmth`,
                 [SummaryAudience.DOCTOR]: `Requirements:
 - Use professional medical terminology for data
 - Present data clearly and objectively
@@ -360,11 +407,14 @@ Focus only on presenting the recorded data in an appropriate tone for the audien
             },
             [SummaryTone.ENCOURAGING]: {
                 [SummaryAudience.PATIENT]: `Requirements:
-- Keep it positive and motivating
-- Use uplifting, hopeful language
-- Focus on the data tracking effort
-- Be encouraging about data collection
-- Maintain optimistic but realistic tone without medical advice`,
+- Keep it positive, upbeat, and motivating (3-4 sentences)
+- Use enthusiastic, uplifting language with exclamation points where appropriate
+- Celebrate their effort in tracking with phrases like "Great job!", "That's wonderful!", "I'm so proud of you!"
+- Focus on their commitment and dedication to tracking
+- Make them feel accomplished and empowered
+- Use encouraging words like "fantastic", "excellent", "keep it up", "you're doing great"
+- Be genuinely enthusiastic about their data collection efforts
+- Maintain optimistic, cheerful tone without medical advice`,
                 [SummaryAudience.DOCTOR]: `Requirements:
 - Balance encouragement with data accuracy
 - Focus on positive aspects of data collection
@@ -392,10 +442,13 @@ Focus only on presenting the recorded data in an appropriate tone for the audien
             },
             [SummaryTone.FACTUAL]: {
                 [SummaryAudience.PATIENT]: `Requirements:
-- Present facts clearly and objectively
-- Use simple, clear language
-- Focus on recorded data and patterns
-- Avoid emotional language
+- Present facts in a dry, neutral manner (1-2 sentences only)
+- Use simple, clear language without any emotion or warmth
+- State only the numbers and facts - nothing more
+- Avoid ALL personal language ("I", "you", emotional words)
+- Be extremely straightforward and brief
+- Use passive voice or third person
+- Sound like a data report, not a conversation
 - Be informative and straightforward without medical interpretation`,
                 [SummaryAudience.DOCTOR]: `Requirements:
 - Present data facts precisely

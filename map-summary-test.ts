@@ -152,7 +152,8 @@ async function testMapSummaryGeneration() {
                     summary.frequency,
                     summary.medianScore,
                     testConfig,
-                    { fallbackEnabled: true }
+                    { fallbackEnabled: true },
+                    summary.dateRange
                 );
                 console.log(`   - AI Summary: "${aiSummary}"`);
             } catch (error) {
@@ -269,6 +270,9 @@ async function testToneAndAudienceVariations() {
         { tone: SummaryTone.PROFESSIONAL, audience: SummaryAudience.FAMILY, description: 'Professional for Family' }
     ];
 
+    // Get date range for test data
+    const testStats = generator.sumRegion(testData.period, mockPainData, testData.region);
+
     for (const testCase of testCases) {
         console.log(`📋 ${testCase.description}:`);
         try {
@@ -282,7 +286,8 @@ async function testToneAndAudienceVariations() {
                     tone: testCase.tone,
                     audience: testCase.audience,
                     fallbackEnabled: true
-                }
+                },
+                testStats.dateRange
             );
             console.log(`   "${summary}"`);
         } catch (error) {
@@ -401,7 +406,8 @@ async function testScenario1_PatientSelfTracking() {
                 tone: SummaryTone.COMPASSIONATE,
                 audience: SummaryAudience.PATIENT,
                 fallbackEnabled: true
-            }
+            },
+            week1Summary.dateRange
         );
         console.log(`Summary for Sarah:\n"${compassionateSummary}"\n`);
     } catch (error) {
@@ -428,7 +434,8 @@ async function testScenario1_PatientSelfTracking() {
                 tone: SummaryTone.ENCOURAGING,
                 audience: SummaryAudience.PATIENT,
                 fallbackEnabled: true
-            }
+            },
+            week2Summary.dateRange
         );
         console.log(`Encouraging Summary:\n"${encouragingSummary}"\n`);
     } catch (error) {
@@ -448,7 +455,8 @@ async function testScenario1_PatientSelfTracking() {
                 tone: SummaryTone.CLINICAL,
                 audience: SummaryAudience.DOCTOR,
                 fallbackEnabled: true
-            }
+            },
+            week1Summary.dateRange
         );
         console.log(`Clinical Summary for Doctor:\n"${clinicalSummary}"\n`);
     } catch (error) {
@@ -516,7 +524,8 @@ async function testScenario2_CaregiverMonitoring() {
                 tone: SummaryTone.COMPASSIONATE,
                 audience: SummaryAudience.CAREGIVER,
                 fallbackEnabled: true
-            }
+            },
+            kneeSummary.dateRange
         );
         console.log(`Summary for Caregiver (Michael):\n"${caregiverSummary}"\n`);
     } catch (error) {
@@ -536,7 +545,8 @@ async function testScenario2_CaregiverMonitoring() {
                 tone: SummaryTone.PROFESSIONAL,
                 audience: SummaryAudience.FAMILY,
                 fallbackEnabled: true
-            }
+            },
+            kneeSummary.dateRange
         );
         console.log(`Summary for Family:\n"${familySummary}"\n`);
     } catch (error) {
@@ -556,7 +566,8 @@ async function testScenario2_CaregiverMonitoring() {
                 tone: SummaryTone.PROFESSIONAL,
                 audience: SummaryAudience.DOCTOR,
                 fallbackEnabled: true
-            }
+            },
+            kneeSummary.dateRange
         );
         console.log(`Professional Report for Doctor:\n"${doctorReport}"\n`);
     } catch (error) {
@@ -638,7 +649,8 @@ async function testScenario3_ResearchDataCollection() {
                 tone: SummaryTone.FACTUAL,
                 audience: SummaryAudience.RESEARCH,
                 fallbackEnabled: true
-            }
+            },
+            baselineSummary.dateRange
         );
         console.log(`Research Summary (Baseline):\n"${researchSummary}"\n`);
     } catch (error) {
@@ -665,7 +677,8 @@ async function testScenario3_ResearchDataCollection() {
                 tone: SummaryTone.FACTUAL,
                 audience: SummaryAudience.RESEARCH,
                 fallbackEnabled: true
-            }
+            },
+            postSummary.dateRange
         );
         console.log(`Research Summary (Post-Intervention):\n"${postResearchSummary}"\n`);
     } catch (error) {

@@ -21,7 +21,6 @@
     "*.ts"
   ],
   "files": [
-    "gemini-llm.ts",
     "map-summary-generation.ts",
     "map-summary-test.ts"
   ],
