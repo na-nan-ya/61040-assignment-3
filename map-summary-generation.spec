@@ -1,4 +1,4 @@
-**ORIGINAL CONCEPT DESIGN**
+*ORIGINAL CONCEPT DESIGN*
 
 **concept** MapSummaryGeneration
 **purpose** concisely summarise all body map logs until present-day
