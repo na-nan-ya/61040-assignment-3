@@ -67,7 +67,8 @@ function loadConfig(): Config {
     try {
         // Try to load from config.json first - handle both compiled and source versions
         const path = require('path');
-        const configPath = path.join(__dirname, 'config.json');
+        const configPath = path.join(__dirname, '..','config.json');
+        console.log('🧠 Looking for config at:', configPath);
         const configData = require(configPath);
         if (configData.apiKey && configData.apiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
             return {
